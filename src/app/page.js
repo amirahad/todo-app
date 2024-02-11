@@ -1,43 +1,43 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaEdit } from 'react-icons/fa';
 import TodoList from './components/todoList';
 
-
 export default function Home() {
-  const [todos, setTodos] = useState(JSON.parse(localStorage?.getItem('todos')) || []);
-  const [input, setInput] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentTodoIndex, setCurrentTodoIndex] = useState(null);
-  const [filter, setFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
-  const [priorityInput, setPriorityInput] = useState('low'); // new state for priority input
+  const [todos, setTodos] = useState(JSON.parse(localStorage?.getItem('todos')) || []); 
+  const [input, setInput] = useState(''); 
+  const [isEditing, setIsEditing] = useState(false); 
+  const [currentTodoIndex, setCurrentTodoIndex] = useState(null); 
+  const [filter, setFilter] = useState('all'); 
+  const [priorityFilter, setPriorityFilter] = useState('all'); 
+  const [priorityInput, setPriorityInput] = useState('low'); 
 
-
-
+  // Effect hook to save todos in local storage whenever they change
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
 
+  // Function to add a new todo or update an existing one
   const addTodo = () => {
-    if (input === '') return;
-    if (isEditing) {
+    if (input === '') return; // Don't add empty todos
+    if (isEditing) { // If the user is editing a todo
       const newTodos = [...todos];
       newTodos[currentTodoIndex] = { text: input, done: todos[currentTodoIndex].done, priority: priorityInput };
       setTodos(newTodos);
       setIsEditing(false);
       setCurrentTodoIndex(null);
-    } else {
+    } else { // If the user is adding a new todo
       setTodos([...todos, { text: input, done: false, priority: priorityInput }]);
     }
     setInput('');
-    setPriorityInput('low'); // reset priority input
+    setPriorityInput('low');
   };
 
+  // Function to delete a todo
   const deleteTodo = (index) => {
     setTodos(todos.filter((_, i) => i !== index));
   };
 
+  // Function to start editing a todo
   const editTodo = (index) => {
     const selectedTodo = todos[index];
     setInput(selectedTodo.text);
@@ -46,12 +46,14 @@ export default function Home() {
     setCurrentTodoIndex(index);
   };
 
+  // Function to toggle the done state of a todo
   const toggleDone = (index) => {
     const newTodos = [...todos];
     newTodos[index].done = !newTodos[index].done;
     setTodos(newTodos);
   };
 
+  // Filter todos based on the filter and priorityFilter state variables
   const filteredTodos = todos.filter(todo => {
     if (filter === 'done' && priorityFilter !== 'all') return todo.done && todo.priority === priorityFilter;
     if (filter === 'notDone' && priorityFilter !== 'all') return !todo.done && todo.priority === priorityFilter;
