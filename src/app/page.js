@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaEdit } from 'react-icons/fa';
+import { FaTimes, FaEdit } from 'react-icons/fa';
 
 
 export default function Home() {
@@ -38,7 +38,9 @@ export default function Home() {
   };
 
   const editTodo = (index) => {
-    setInput(todos[index].text);
+    const selectedTodo = todos[index];
+    setInput(selectedTodo.text);
+    setPriorityInput(selectedTodo.priority);
     setIsEditing(true);
     setCurrentTodoIndex(index);
   };
@@ -59,16 +61,35 @@ export default function Home() {
   });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-16">
-      <h1 className="text-4xl font-bold mb-8">Todo App</h1>
-      <div className="flex flex-col w-full max-w-lg  p-6 rounded-lg shadow-md">
-        <div className="mb-3 grid grid-cols-2 gap-2" >
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-16">
+      <div className="flex flex-col w-full max-w-lg sm:max-w-sm md:max-w-lg p-4 sm:p-6 rounded-lg shadow-md bg-white bg-opacity-25 backdrop-blur-md">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Todo App</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center my-5">
+          <input
+            type="text"
+            placeholder="Add Todo"
+            className="p-2 border-2 border-gray-300 rounded  w-full md:w-auto sm:flex-grow mb-2 "
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <select
+            value={priorityInput}
+            onChange={(e) => setPriorityInput(e.target.value)}
+            className="p-2 border-2 border-gray-300 rounded w-full md:w-auto md:flex-grow mb-2 mx-0 md:mx-1"
+          >
+            <option value="low">Low Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="high">High Priority</option>
+          </select>
+          <button className="p-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors w-full md:w-auto mb-2" onClick={addTodo}>{isEditing ? 'Update' : 'Add'}</button>
+        </div>
+        <div className="my-2 sm:mb-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div className="flex flex-col" >
             <label>Filter by Status:</label>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="p-2 border-2 border-gray-300 rounded text-black "
+              className="p-2 border-2 border-gray-300 rounded "
             >
               <option value="all">All</option>
               <option value="done">Done</option>
@@ -80,7 +101,7 @@ export default function Home() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="p-2 border-2 border-gray-300 rounded text-black "
+              className="p-2 border-2 border-gray-300 rounded "
             >
               <option value="all">All Priorities</option>
               <option value="low">Low Priority</option>
@@ -89,42 +110,30 @@ export default function Home() {
             </select>
           </div>
         </div>
-        <div className="flex justify-between items-center  mt-5">
-          <input
-            type="text"
-            placeholder="Add Todo"
-            className="p-2 border-2 border-gray-300 rounded text-black w-full"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <select
-            value={priorityInput}
-            onChange={(e) => setPriorityInput(e.target.value)}
-            className="p-2 border-2 border-gray-300 rounded text-black ml-2"
-          >
-            <option value="low">Low Priority</option>
-            <option value="medium">Medium Priority</option>
-            <option value="high">High Priority</option>
-          </select>
-          <button className="p-2 bg-green-500 text-white rounded hover:bg-blue-600 transition-colors ml-2" onClick={addTodo}>{isEditing ? 'Update' : 'Add'}</button>
-        </div>
 
-        {filteredTodos.map((todo, index) => (
-          <div className="flex justify-between items-center p-2 border-b-2 border-gray-300 mt-4" key={index}>
-            <div className="flex items-center" >
-              <input
-                type="checkbox"
-                checked={todo.done}
-                onChange={() => toggleDone(index)}
-              />
-              <p className="ml-3" style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.text}</p>
-            </div>
-            <div>
-              <button className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ml-2" onClick={() => editTodo(index)}><FaEdit /></button>
-              <button className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ml-2" onClick={() => deleteTodo(index)}><FaTimes /></button>
-            </div>
-          </div>
-        ))}
+
+        {filteredTodos
+          .slice(0)
+          .reverse()
+          .map((todo, index) => {
+            const originalIndex = todos.length - 1 - index;
+            return (
+              <div className="flex justify-between items-center p-2 border-b-2 border-gray-300 mt-2" key={index}>
+                <div className="flex items-center" >
+                  <input
+                    type="checkbox"
+                    checked={todo.done}
+                    onChange={() => toggleDone(originalIndex)}
+                  />
+                  <p className="ml-3" style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.text}</p>
+                </div>
+                <div>
+                  <button className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ml-2" onClick={() => editTodo(originalIndex)}><FaEdit /></button>
+                  <button className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ml-2" onClick={() => deleteTodo(originalIndex)}><FaTimes /></button>
+                </div>
+              </div>
+            );
+          })}
       </div>
     </main>
   );
