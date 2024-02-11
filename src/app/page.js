@@ -9,7 +9,10 @@ export default function Home() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentTodoIndex, setCurrentTodoIndex] = useState(null);
   const [filter, setFilter] = useState('all');
-  
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [priorityInput, setPriorityInput] = useState('low'); // new state for priority input
+
+
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -19,14 +22,15 @@ export default function Home() {
     if (input === '') return;
     if (isEditing) {
       const newTodos = [...todos];
-      newTodos[currentTodoIndex] = { text: input, done: todos[currentTodoIndex].done };
+      newTodos[currentTodoIndex] = { text: input, done: todos[currentTodoIndex].done, priority: priorityInput };
       setTodos(newTodos);
       setIsEditing(false);
       setCurrentTodoIndex(null);
     } else {
-      setTodos([...todos, { text: input, done: false }]);
+      setTodos([...todos, { text: input, done: false, priority: priorityInput }]);
     }
     setInput('');
+    setPriorityInput('low'); // reset priority input
   };
 
   const deleteTodo = (index) => {
@@ -46,29 +50,46 @@ export default function Home() {
   };
 
   const filteredTodos = todos.filter(todo => {
+    if (filter === 'done' && priorityFilter !== 'all') return todo.done && todo.priority === priorityFilter;
+    if (filter === 'notDone' && priorityFilter !== 'all') return !todo.done && todo.priority === priorityFilter;
     if (filter === 'done') return todo.done;
     if (filter === 'notDone') return !todo.done;
+    if (priorityFilter !== 'all') return todo.priority === priorityFilter;
     return true;
   });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 ">
+    <main className="flex min-h-screen flex-col items-center justify-center p-16">
       <h1 className="text-4xl font-bold mb-8">Todo App</h1>
-      <div className="flex flex-col w-full max-w-md  p-6 rounded-lg shadow-md">
+      <div className="flex flex-col w-full max-w-lg  p-6 rounded-lg shadow-md">
         <div className="mb-3 grid grid-cols-2 gap-2" >
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="p-2 border-2 border-gray-300 rounded text-black "
-          >
-            <option value="all">All</option>
-            <option value="done">Done</option>
-            <option value="notDone">Not Done</option>
-          </select>
+          <div className="flex flex-col" >
+            <label>Filter by Status:</label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="p-2 border-2 border-gray-300 rounded text-black "
+            >
+              <option value="all">All</option>
+              <option value="done">Done</option>
+              <option value="notDone">Not Done</option>
+            </select>
+          </div>
+          <div className="flex flex-col" >
+            <label>Filter by Priority:</label>
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="p-2 border-2 border-gray-300 rounded text-black "
+            >
+              <option value="all">All Priorities</option>
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+            </select>
+          </div>
         </div>
-        <div
-          className="flex justify-between items-center"
-        >
+        <div className="flex justify-between items-center  mt-5">
           <input
             type="text"
             placeholder="Add Todo"
@@ -76,7 +97,16 @@ export default function Home() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" onClick={addTodo}>{isEditing ? 'Update' : 'Add'}</button>
+          <select
+            value={priorityInput}
+            onChange={(e) => setPriorityInput(e.target.value)}
+            className="p-2 border-2 border-gray-300 rounded text-black ml-2"
+          >
+            <option value="low">Low Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="high">High Priority</option>
+          </select>
+          <button className="p-2 bg-green-500 text-white rounded hover:bg-blue-600 transition-colors ml-2" onClick={addTodo}>{isEditing ? 'Update' : 'Add'}</button>
         </div>
 
         {filteredTodos.map((todo, index) => (
