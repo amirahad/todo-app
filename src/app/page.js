@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaEdit } from 'react-icons/fa';
+import TodoList from './components/todoList';
 
 
 export default function Home() {
@@ -112,28 +113,12 @@ export default function Home() {
         </div>
 
 
-        {filteredTodos
-          .slice(0)
-          .reverse()
-          .map((todo, index) => {
-            const originalIndex = todos.length - 1 - index;
-            return (
-              <div className="flex justify-between items-center p-2 border-b-2 border-gray-300 mt-2" key={index}>
-                <div className="flex items-center" >
-                  <input
-                    type="checkbox"
-                    checked={todo.done}
-                    onChange={() => toggleDone(originalIndex)}
-                  />
-                  <p className="ml-3" style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.text}</p>
-                </div>
-                <div>
-                  <button className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ml-2" onClick={() => editTodo(originalIndex)}><FaEdit /></button>
-                  <button className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ml-2" onClick={() => deleteTodo(originalIndex)}><FaTimes /></button>
-                </div>
-              </div>
-            );
-          })}
+        <TodoList
+          todos={filteredTodos}
+          toggleDone={toggleDone}
+          editTodo={editTodo}
+          deleteTodo={deleteTodo}
+        />
       </div>
     </main>
   );
