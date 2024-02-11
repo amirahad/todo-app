@@ -3,17 +3,25 @@ import React, { useState, useEffect } from 'react';
 import TodoList from './components/todoList';
 
 export default function Home() {
-  const [todos, setTodos] = useState(JSON.parse(localStorage?.getItem('todos')) || []); 
-  const [input, setInput] = useState(''); 
-  const [isEditing, setIsEditing] = useState(false); 
-  const [currentTodoIndex, setCurrentTodoIndex] = useState(null); 
-  const [filter, setFilter] = useState('all'); 
-  const [priorityFilter, setPriorityFilter] = useState('all'); 
-  const [priorityInput, setPriorityInput] = useState('low'); 
+  const [todos, setTodos] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('todos')) || [];
+    } else {
+      return [];
+    }
+  });
+  const [input, setInput] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentTodoIndex, setCurrentTodoIndex] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [priorityInput, setPriorityInput] = useState('low');
 
   // Effect hook to save todos in local storage whenever they change
   useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
   }, [todos]);
 
   // Function to add a new todo or update an existing one
